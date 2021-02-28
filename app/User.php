@@ -2,13 +2,24 @@
 
 namespace App;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Str;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
     use Notifiable;
+
+    // table name
+    protected $table = 'users';
+
+    // admin status
+    const ADMIN_USER = true;
+    const REGULAR_USER = false;
+
+    // user verification status
+    const VERIFIED_USER = '1';
+    const UNVERIFIED_USER = '0';
 
     /**
      * The attributes that are mass assignable.
@@ -16,7 +27,12 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name',
+        'email',
+        'password',
+        'verified',
+        'verification_token',
+        'admin',
     ];
 
     /**
@@ -25,7 +41,9 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
+        'verification_token',
     ];
 
     /**
@@ -36,4 +54,19 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    // to check if a user is admin
+    public function isAdmin(){
+        return $this->admin == User::ADMIN_USER;
+    }
+
+    // to check if a user is verified
+    public function isVerified(){
+        return $this->verified == User::VERIFIED_USER;
+    }
+
+    // to generate code for verification
+    public static function generateVerificationCode(){
+        return Str::random(45);
+    }
 }
