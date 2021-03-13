@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -12,8 +11,22 @@ use Illuminate\Support\Facades\Route;
 | routes are loaded by the RouteServiceProvider within a group which
 | is assigned the "api" middleware group. Enjoy building your API!
 |
-*/
+ */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// categories
+Route::resource('categories', 'Category\CategoryController', ['except' => ['create', 'edit']]);
+
+// user
+Route::resource('user', 'User\UserController', ['except' => ['create', 'edit']]);
+
+// transaction
+Route::resource('transaction', 'Transaction\TransactionController', ['only' => ['index', 'show']]);
+
+// Seller
+Route::resource('seller', 'Seller\SellerController', ['only' => ['index', 'show']]);
+
+// Product
+Route::resource('product', 'Product\ProductController', ['only' => ['index', 'show']]);
+
+// buyer
+Route::resource('buyers', 'Buyer\BuyerController', ['only' => ['index', 'show']]);

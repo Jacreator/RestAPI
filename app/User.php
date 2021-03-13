@@ -2,9 +2,9 @@
 
 namespace App;
 
-use Illuminate\Support\Str;
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
@@ -56,17 +56,44 @@ class User extends Authenticatable
     ];
 
     // to check if a user is admin
-    public function isAdmin(){
+    public function isAdmin()
+    {
         return $this->admin == User::ADMIN_USER;
     }
 
     // to check if a user is verified
-    public function isVerified(){
+    public function isVerified()
+    {
         return $this->verified == User::VERIFIED_USER;
     }
 
     // to generate code for verification
-    public static function generateVerificationCode(){
+    public static function generateVerificationCode()
+    {
         return Str::random(45);
+    }
+
+    // setters for name
+    public function setNameAttribute($name)
+    {
+        $this->attributes['name'] = strtolower($name);
+    }
+
+    // getter for name
+    public function getNameAttribute($name)
+    {
+        return ucwords($name);
+    }
+
+    // setters for email
+    public function setEmailAttribute($email)
+    {
+        $this->attributes['email'] = strtolower($email);
+    }
+
+    // getter for name
+    public function getEmailAttribute($email)
+    {
+        return ucwords($email);
     }
 }

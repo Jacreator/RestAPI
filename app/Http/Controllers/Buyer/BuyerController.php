@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Buyer;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Models\Buyer;
 
 class BuyerController extends Controller
 {
@@ -14,28 +14,15 @@ class BuyerController extends Controller
      */
     public function index()
     {
-        //
-    }
+        // get all the users with transaction id
+        $buyers = Buyer::has('transactions')->get();
+        $buyersTotal = Buyer::has('transactions')->count();
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
+        if (is_null($buyers)) {
+            return response()->json(['error' => 'No Buyer found at the moment', 'code' => 404], 404);
+        }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
+        return response()->json(['totalBuyer' => $buyersTotal, 'data' => $buyers], 201);
     }
 
     /**
@@ -46,40 +33,8 @@ class BuyerController extends Controller
      */
     public function show($id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        // get a single buyer
+        $buyer = Buyer::has('transactions')->findOrFail($id);
+        return response()->json(['data' => $buyer], 201);
     }
 }
