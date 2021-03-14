@@ -2,16 +2,18 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
-    use Notifiable;
+    use Notifiable, SoftDeletes;
 
     // table name
     protected $table = 'users';
+    protected $date = ['deleted_at'];
 
     // admin status
     const ADMIN_USER = true;

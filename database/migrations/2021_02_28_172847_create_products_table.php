@@ -23,6 +23,7 @@ class CreateProductsTable extends Migration
             $table->string('image');
             $table->bigInteger('seller_id')->unsigned();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::table('products', function ($table) {
