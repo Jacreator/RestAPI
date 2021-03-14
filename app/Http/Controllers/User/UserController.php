@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\User;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\ApiController;
 use App\User;
 use Illuminate\Http\Request;
 
-class UserController extends Controller
+class UserController extends ApiController
 {
     /**
      * Display a listing of the resource.
@@ -17,10 +17,8 @@ class UserController extends Controller
     {
         $users = User::all();
         $usersTotal = User::all()->count();
-        if (is_null($users)) {
-            return response()->json(['message' => 'No record in the table'], 401);
-        }
-        return response()->json(['total' => $usersTotal, 'data' => $users], 200);
+        
+        return $this->showAll($users);
     }
 
     /**
@@ -51,7 +49,7 @@ class UserController extends Controller
         // create users
         $user = User::create($data);
 
-        return response()->json(['data' => $user], 201);
+        return $this->showOne($user, 201);
     }
 
     /**
@@ -64,7 +62,7 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        return response()->json(['data' => $user], 200);
+        return $this->showOne($user);
     }
 
     /**
@@ -107,7 +105,7 @@ class UserController extends Controller
         // check admin and make sure it's only a verified user that can update
         if ($request->has('admin')) {
             if (!$user->isVerified()) {
-                return response()->json(['error' => 'only a verified user can modify admin status', 'code' => 409], 409);
+                return $this->errorResponse('only a verified user can modify admin status', 409);
             }
 
             $user->admin = $request->admin;
@@ -115,13 +113,13 @@ class UserController extends Controller
 
         // check if any value was changed
         if (!$user->isDirty()) {
-            return response()->json(['error' => 'You need to specify at least one different value to update', 'code' => 422], 422);
+            return $this->errorResponse('You need to specify at least one different value to update', 422);
         }
 
         // save user information
         $user->save();
 
-        return response()->json(['data' => $user], 201);
+        return $this->showAll($user, 201);
     }
 
     /**
@@ -136,6 +134,6 @@ class UserController extends Controller
 
         $user->delete();
 
-        return response()->json(['message' => 'User Successfully Deleted', 'data' => $user], 201);
+        return $this->showOne($user);
     }
 }

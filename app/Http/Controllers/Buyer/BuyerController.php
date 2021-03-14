@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Buyer;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\ApiController;
 use App\Models\Buyer;
 
-class BuyerController extends Controller
+class BuyerController extends ApiController
 {
     /**
      * Display a listing of the resource.
@@ -19,10 +19,11 @@ class BuyerController extends Controller
         $buyersTotal = Buyer::has('transactions')->count();
 
         if (is_null($buyers)) {
-            return response()->json(['error' => 'No Buyer found at the moment', 'code' => 404], 404);
+            return $this->errorResponse('No Buyer found at the moment', 404);
         }
 
-        return response()->json(['totalBuyer' => $buyersTotal, 'data' => $buyers], 201);
+        $data = ['total' => $buyersTotal, 'data' => $buyers];
+        return $this->showAll($buyers);
     }
 
     /**
@@ -35,6 +36,6 @@ class BuyerController extends Controller
     {
         // get a single buyer
         $buyer = Buyer::has('transactions')->findOrFail($id);
-        return response()->json(['data' => $buyer], 201);
+        return $this->showOne($buyer);
     }
 }

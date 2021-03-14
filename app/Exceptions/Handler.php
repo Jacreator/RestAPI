@@ -2,11 +2,22 @@
 
 namespace App\Exceptions;
 
+use App\Traits\ApiResponser;
+use config;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
 {
+    use ApiResponser;
     /**
      * A list of the exception types that are not reported.
      *
@@ -50,6 +61,90 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
-        return parent::render($request, $exception);
+        // handling validation error
+        if ($exception instanceof ValidationException) {
+            // call the converted validation respone
+            return $this->convertValidationExceptionToResponse($exception, $request);
+        }
+
+        // handling Model error
+        if ($exception instanceof ModelNotFoundException) {
+            // get model name
+            $modelName = strtolower(class_basename($exception->getModel()));
+            return $this->errorResponse("Does not exist any {$modelName} with the specified identificator", 404);
+        }
+
+        // handling unauthenticated error
+        if ($exception instanceof AuthenticationException) {
+            # call the unauthenticated method and pass request before exception
+            return $this->unauthenticated($request, $exception);
+        }
+
+        // handling Authorization error
+        if ($exception instanceof AuthorizationException) {
+            return $this->errorResponse($exception->getMessage(), 403);
+        }
+
+        // handling Url not found error
+        if ($exception instanceof NotFoundHttpException) {
+            return $this->errorResponse("The specified Url cannot be found", 404);
+        }
+
+        // handling Method not allowed error
+        if ($exception instanceof MethodNotAllowedHttpException) {
+            return $this->errorResponse("The specified Method for this request is invalid", 405);
+        }
+
+        // handling any other error
+        if ($exception instanceof HttpException) {
+            return $this->errorResponse($exception->getMessage(), $exception->getStatusCode());
+        }
+
+        // handling delete error
+        if ($exception instanceof QueryException) {
+            $errorCode = $exception->errorInfo[1];
+            if ($errorCode == 1451) {
+                return $this->errorResponse("Cannot Remove this resource parmenently. It is related to other resources", 409);
+            }
+            // could not connect to db
+            if ($errorCode == 2002) {
+                return $this->errorResponse("Database Server is done", 409);
+            }
+
+        }
+
+        // handling life unexcepted error
+        if (config('app.debug')) {
+            return parent::render($request, $exception);
+        }
+
+        return $this->errorResponse("Unexcepted Exception, Please Try Again Later", 500);
+    }
+
+    /**
+     * Create a response object from the given validation exception.
+     *
+     * @param  \Illuminate\Validation\ValidationException  $e
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function convertValidationExceptionToResponse(ValidationException $e, $request)
+    {
+        $error = $e->validator->errors()->getMessages();
+
+        return $this->errorResponse($error, 422);
+    }
+
+    /**
+     * Convert an authentication exception into a response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Auth\AuthenticationException  $exception
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function unauthenticated($request, AuthenticationException $exception)
+    {
+        return $this->errorResponse('Unauthenticated', 401);
+
     }
 }
