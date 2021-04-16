@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\ApiController;
 use Illuminate\Support\Facades\Storage;
 use App\Transformers\Seller\SellerTransformer;
+use Illuminate\Auth\Access\AuthorizationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class SellerProductController extends ApiController
@@ -18,7 +19,8 @@ class SellerProductController extends ApiController
     {
         parent::__construct();
 
-        $this->middleware('trasform.input:' . SellerTransformer::class)->only(['store', 'update']);
+        $this->middleware('transform.input:' . SellerTransformer::class)->only(['store', 'update']);
+        $this->middleware('scope:manage-products')->except('index');
     }
     /**
      * Display a listing of the resource.
@@ -27,10 +29,17 @@ class SellerProductController extends ApiController
      */
     public function index(Seller $seller)
     {
-        //
-        $products = $seller->products;
+        // using condition to check scopes
+        if (request()->user()->tokenCan('read-general') || request()->user()->tokensCan('manage-products')) {
+            
+            $products = $seller->products;
 
-        return $this->showAll($products);
+            return $this->showAll($products);
+            // return response()->json($products);
+        }
+
+        throw new AuthorizationException;
+        
     }
 
     /**

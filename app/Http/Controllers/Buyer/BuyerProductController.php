@@ -12,6 +12,7 @@ class BuyerProductController extends ApiController
     {
         // call the prent constructor which has the api auth
         parent::__construct();
+        $this->middleware('scope:read-general')->only('index');
     }
     /**
      * Display a listing of the resource.

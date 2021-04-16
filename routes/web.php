@@ -36,6 +36,6 @@ Route::get('/home/my-clients', 'HomeController@getClient')->name('personal-clien
 Route::get('/home/authorize', 'HomeController@getAuthorized')->name('authorization');
 
 
-Route::get('/{any?}', function (){
-    return view('welcome');
-})->where('any', '^(?!\/)[\/\w\.-]*');
+// Route::get('/{any?}', function (){
+//     return view('welcome');
+// })->where('any', '^(?!\/)[\/\w\.-]*');

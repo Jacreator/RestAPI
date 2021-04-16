@@ -13,9 +13,9 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::get('/{any?}', function (){
-    return view('welcome');
-})->where('any', '^(?!api\/)[\/\w\.-]*');
+// Route::get('/{any?}', function (){
+//     return view('welcome');
+// })->where('any', '^(?!api\/)[\/\w\.-]*');
 
 // categories
 Route::ApiResource('categories', 'Category\CategoryController', ['except' => ['create', 'edit']]);

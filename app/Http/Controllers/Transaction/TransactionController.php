@@ -11,6 +11,7 @@ class TransactionController extends ApiController
     {
         // call the prent constructor which has the api auth
         parent::__construct();
+        $this->middleware('scope:read-general')->only('show');
     }
     /**
      * Display a listing of the resource.

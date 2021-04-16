@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Product;
 
-use App\Models\User;
+use App\User;
 use App\Models\Product;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
@@ -16,7 +16,8 @@ class ProductBuyerTransactionController extends ApiController
     {
         parent::__construct();
 
-        $this->middleware('trasform.input:' . ProductTransformer::class)->only(['store']);
+        $this->middleware('transform.input:' . ProductTransformer::class)->only(['store']);
+        $this->middleware('scope:purchase-product')->only(['store']);
     }
 
     /**

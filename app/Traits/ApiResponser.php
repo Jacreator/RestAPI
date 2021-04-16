@@ -35,7 +35,7 @@ trait ApiResponser{
 
         // paginate collection
         $collection = $this->paginateCollection($collection);
-
+        
         // transform collection
         $collection = $this->transformData($collection, $transformer);
 
@@ -62,6 +62,7 @@ trait ApiResponser{
 
     // a transformation function
     protected function transformData($data, $transformer){
+        
         // transform the data with factal
         $transaformation = fractal($data, new $transformer);
 
@@ -102,6 +103,7 @@ trait ApiResponser{
             'per_page' => 'integer|min:2|max:50'
         ];
 
+        
         // validation using support facade
         Validator::validate(request()->all(), $rules);
 

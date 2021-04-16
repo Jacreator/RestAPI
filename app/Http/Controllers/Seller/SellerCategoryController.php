@@ -11,6 +11,7 @@ class SellerCategoryController extends ApiController
     public function __construct()
     {
         $this->middleware('client.credentials')->only(['index']);
+        $this->middleware('scope:read-general')->only('index');
     }
     /**
      * Display a listing of the resource.
