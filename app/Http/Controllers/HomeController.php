@@ -27,12 +27,24 @@ class HomeController extends Controller
     }
 
     /**
-     * Show the application dashboard.
+     * get user access token.
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
     public function getToken()
     {
         return view('home.personal-tokens');
+    }
+
+    public function getClient()
+    {
+        # code...
+        return view('home.personal-client');
+    }
+
+    public function getAuthorized()
+    {
+        # code...
+        return view('home.authorize');
     }
 }

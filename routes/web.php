@@ -32,3 +32,10 @@ Route::get('/home', 'HomeController@index')->name('home');
 
 // passport vue route
 Route::get('/home/my-tokens', 'HomeController@getToken')->name('personal-token');
+Route::get('/home/my-clients', 'HomeController@getClient')->name('personal-client');
+Route::get('/home/authorize', 'HomeController@getAuthorized')->name('authorization');
+
+
+Route::get('/{any?}', function (){
+    return view('welcome');
+})->where('any', '^(?!\/)[\/\w\.-]*');

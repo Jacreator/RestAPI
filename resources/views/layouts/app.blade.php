@@ -37,6 +37,12 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('personal-token') }}">My Token</a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('personal-client') }}">My Client</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('authorization') }}">authorized</a>
+                                </li>
                             @endif
                     </ul>
 
