@@ -41,7 +41,8 @@ class Handler extends ExceptionHandler
     /**
      * Report or log an exception.
      *
-     * @param  \Throwable  $exception
+     * @param \Throwable $exception 
+     * 
      * @return void
      *
      * @throws \Exception
@@ -54,8 +55,9 @@ class Handler extends ExceptionHandler
     /**
      * Render an exception into an HTTP response.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Throwable  $exception
+     * @param \Illuminate\Http\Request $request 
+     * @param \Throwable               $exception 
+     * 
      * @return \Symfony\Component\HttpFoundation\Response
      *
      * @throws \Throwable
@@ -77,7 +79,7 @@ class Handler extends ExceptionHandler
 
         // handling unauthenticated error
         if ($exception instanceof AuthenticationException) {
-            # call the unauthenticated method and pass request before exception
+            //  call the unauthenticated method and pass request before exception
             return $this->unauthenticated($request, $exception);
         }
 
@@ -130,8 +132,9 @@ class Handler extends ExceptionHandler
     /**
      * Create a response object from the given validation exception.
      *
-     * @param  \Illuminate\Validation\ValidationException  $e
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Validation\ValidationException $e 
+     * @param \Illuminate\Http\Request                   $request 
+     * 
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function convertValidationExceptionToResponse(ValidationException $e, $request)
@@ -139,11 +142,11 @@ class Handler extends ExceptionHandler
         $errors = $e->validator->errors()->getMessages();
 
         // check what kind of error
-        if ($this->isFrontEnd($request)) {
+        if ($this->_isFrontEnd($request)) {
             return $request->ajax() ? $this->errorResponse($errors, 422) : redirect()
-            ->back()
-            ->withInput($request->input())
-            ->withErrors($errors);
+                ->back()
+                ->withInput($request->input())
+                ->withErrors($errors);
         }
 
         return $this->errorResponse($errors, 422);
@@ -152,21 +155,32 @@ class Handler extends ExceptionHandler
     /**
      * Convert an authentication exception into a response.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Auth\AuthenticationException  $exception
+     * @param \Illuminate\Http\Request                 $request 
+     * @param \Illuminate\Auth\AuthenticationException $exception 
+     * 
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function unauthenticated($request, AuthenticationException $exception)
     {
-        if ($this->isFrontEnd($request)) {
+        if ($this->_isFrontEnd($request)) {
             redirect()->guest('login');
         }
         return $this->errorResponse('Unauthenticated', 401);
 
     }
 
-    private function isFrontEnd($request)
+    /**
+     * Check if request is ajax or web 
+     * 
+     * @param \Request $request 
+     * 
+     * @return response()
+     */
+    private function _isFrontEnd($request)
     {
-        return $request->acceptsHtml() && collect($request->route()->middleware())->contains('web');
+        return $request->acceptsHtml() && collect(
+            $request->route()
+                ->middleware()
+        )->contains('web');
     }
 }
